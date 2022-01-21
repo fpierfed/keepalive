@@ -36,11 +36,11 @@ class Bot(Client):
 
         if os.path.isfile(STATE_FILE):
             with open(STATE_FILE) as f:
-                self.thread_ids = set(json.load(f))
+                self.thread_ids = {str(_id) for _id in json.load(f)}
 
     def checkpoint(self):
         with open(STATE_FILE, 'w') as f:
-            json.dump(list(self.thread_ids), f)
+            json.dump([str(_id) for _id in self.thread_ids], f)
 
     @Client.event
     async def on_ready(self):
@@ -63,10 +63,11 @@ class Bot(Client):
 
             connected_guild = self.connected_guilds[guild_id]
             threads, _ = await connected_guild.list_active_threads()
-            added_threads = {thread.id for thread in threads}
+            added_threads = {str(thread.id) for thread in threads}
             self.thread_ids |= added_threads
             return f'Threads {added_threads} are being kept alive.'
 
+        thread_id = str(thread_id)
         if thread_id in self.thread_ids:
             return f'{thread_id} is already being kept alive'
 
@@ -75,6 +76,7 @@ class Bot(Client):
 
     @command(description='Do not keep the given thread ID alive anymore')
     async def rmthread(self, thread_id: str):
+        thread_id = str(thread_id)
         if thread_id not in self.thread_ids:
             return f'{thread_id} was not being kept alive anyway'
 
