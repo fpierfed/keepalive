@@ -4,6 +4,7 @@ import os
 import aiocron
 import dotenv
 from pincer import Client
+import pincer
 from pincer.commands import command
 from pincer.objects import Guild, MessageContext
 
@@ -99,9 +100,12 @@ class Bot(Client):
     async def keep_alive(self, thread_id):
         print(f'Keeping thread {thread_id} alive')
 
-        channel = await self.get_channel(int(thread_id))
-        msg = await channel.send('ping')
-        await msg.delete()
+        try:
+            channel = await self.get_channel(int(thread_id))
+            msg = await channel.send('ping')
+            await msg.delete()
+        except pincer.exceptions.NotFoundError:
+            print(f'{thread_id} was not found. Consider removing it from the list')
 
 
 if __name__ == "__main__":
