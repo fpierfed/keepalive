@@ -87,6 +87,11 @@ class Bot(Client):
     async def lsthread(self):
         return f'Keeping these thread IDs alive: {self.thread_ids}'
 
+    @command(description='Manually execute keepalive')
+    async def keepalive(self):
+        await self.keep_them_all_alive()
+        return f'Kept these thread IDs alive: {self.thread_ids}'
+
     async def keep_them_all_alive(self):
         for thread_id in self.thread_ids:
             await self.keep_alive(thread_id)
